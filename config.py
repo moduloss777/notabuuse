@@ -2,6 +2,7 @@
 Configuración centralizada para Traffilink API
 Almacena variables de entorno y constantes del sistema
 """
+import os
 
 # ==================== TRAFFILINK API CONFIG ====================
 TRAFFILINK_BASE_URL = "http://47.236.91.242:20003"
