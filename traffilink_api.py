@@ -76,6 +76,10 @@ class TrafficLinkAPI:
             Dict con datos parseados o error
         """
         try:
+            # Log detallado para debugging
+            logger.debug(f"Status Code: {response.status_code}")
+            logger.debug(f"Response Text: {response.text}")
+
             data = response.json()
 
             # Verificar si hay código de error
@@ -112,6 +116,9 @@ class TrafficLinkAPI:
         try:
             logger.info("📊 Consultando balance de cuenta...")
             url = f"{self.base_url}/getbalance"
+            logger.info(f"📡 URL: {url}")
+            logger.info(f"🔐 Account: {self.account}")
+
             response = self.session.get(url, params=params, timeout=10)
             response.raise_for_status()
 
@@ -126,6 +133,18 @@ class TrafficLinkAPI:
 
             return data
 
+        except requests.exceptions.Timeout:
+            logger.error(f"❌ TIMEOUT: El servidor no respondió en 10 segundos. Verifica conectividad a {self.base_url}")
+            return {"code": -98, "error_message": "Timeout de conexión"}
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"❌ ERROR DE CONEXIÓN: No se puede conectar a {self.base_url}")
+            logger.error(f"   Detalle: {str(e)}")
+            logger.error(f"   Posibles causas:")
+            logger.error(f"   - IP/puerto incorrectos")
+            logger.error(f"   - Servidor no está disponible")
+            logger.error(f"   - Firewall bloqueando conexión")
+            logger.error(f"   - Render.com no tiene acceso a esa red")
+            return {"code": -97, "error_message": f"No se puede conectar: {str(e)}"}
         except requests.exceptions.RequestException as e:
             logger.error(f"❌ Error de conexión: {str(e)}")
             return {"code": -99, "error_message": f"Error de conexión: {str(e)}"}
